@@ -1,12 +1,21 @@
-import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
-
+import { Fragment } from 'react';
+import { createStackNavigator } from '@react-navigation/stack';
+import RootNavigation from './navigations/RootNavigation';
+import { Provider } from 'react-redux';
+import Store from './app/store';
 export default function App() {
+
+  const Stack=createStackNavigator()
+
+
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Fragment>
+        <Provider store={Store}>
+          <RootNavigation/>
+        </Provider>
+    </Fragment>
   );
 }
 
