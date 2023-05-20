@@ -7,12 +7,17 @@ import HomeScreen from '../screens/HomeScreen'
 import { FontAwesome } from '@expo/vector-icons';
 import { FontAwesome5 } from '@expo/vector-icons'; 
 import { MaterialIcons } from '@expo/vector-icons'; 
+import { useEffect } from 'react'
 
 
 
-export default function TabNavigation() {
+export default function TabNavigation({user,route}) {
 
     const Tab=createBottomTabNavigator()
+
+    useEffect(()=>{
+
+    }, [user])
 
   return (
     <Tab.Navigator
@@ -31,7 +36,7 @@ export default function TabNavigation() {
         tabBarActiveTintColor:'white',
       }}
     >
-        <Tab.Screen 
+        {/* <Tab.Screen 
           name="Home" 
           component={HomeScreen}
           options={{
@@ -41,7 +46,20 @@ export default function TabNavigation() {
               <FontAwesome name="home" size={size} color={color}/>
             )
           }}
-        />
+
+        /> */}
+        <Tab.Screen
+           name="Home" 
+          // component={HomeScreen}
+          options={{
+            headerShown:false,
+            tabBarLabel:'Home',
+            tabBarIcon:({color,size})=>(
+              <FontAwesome name="home" size={size} color={color}/>
+            )}}
+        >
+          {props=>(<HomeScreen user={user} {...props}/>)}
+        </Tab.Screen>
         <Tab.Screen 
           name="Cart" 
           component={CartScreen}

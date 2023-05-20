@@ -7,12 +7,20 @@ import Categories from '../components/home/Categories';
 import OfferSlider from '../components/home/OfferSlider';
 import Menu from '../components/home/Menu';
 import SearchBox from '../components/home/SearchBox';
+import { useDispatch } from 'react-redux';
 
 
 
-const HomeScreen = ({navigation}) => {
+const HomeScreen = ({navigation, user}) => {
+
+  const dispatch=useDispatch()
+
+  useEffect(()=>{
+
+  },[user])
 
 
+  const{name,email}=user
 
     function headerBtnHandler(){
         console.log("pressed")
@@ -21,7 +29,7 @@ const HomeScreen = ({navigation}) => {
     useLayoutEffect(()=>{
         navigation.setOptions({
             headerRight:()=>{
-                return (<IconButton icon="user-alt" color="crimson" onPress={headerBtnHandler}/>)
+                return (<IconButton icon="user-alt" color="white" onPress={headerBtnHandler}/>)
             }
         })
     },[navigation,headerBtnHandler])
@@ -34,6 +42,7 @@ const HomeScreen = ({navigation}) => {
     <Fragment>
       <ScrollView>
       <View style={styles.container}>
+          <Text style={styles.wlcTxt}>Welcome {name}</Text>
           <SearchBox/>
           <Categories/>
           <OfferSlider/>
@@ -54,6 +63,12 @@ const styles = StyleSheet.create({
     justifyContent:'center',
     alignItems:'center',
   },
+  wlcTxt:{
+    marginVertical:5,
+    fontSize:25,
+    fontWeight:500,
+    color:'crimson'
+  }
   
  
 })

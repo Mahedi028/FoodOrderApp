@@ -4,7 +4,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import { fetchMenu } from '../store/menu/menuActions'
 import Bedge from '../components/UI/bedge/bedge'
 import { Ionicons } from '@expo/vector-icons';
-const MenuDetailsScreen = ({route}) => {
+const MenuDetailsScreen = ({route, user}) => {
+
+    const {name,email}=user
+
+    // useEffect(()=>{
+
+    // },[user])
 
     const menu=useSelector((state)=>state.menu.menuDetails || {})
     const{title,description,price,discount_price,meal_thumbnail,ingredients,dietary_info,in_stock}=menu
@@ -19,10 +25,11 @@ const MenuDetailsScreen = ({route}) => {
 
     useEffect(()=>{
         dispatch(fetchMenu({id}))
-    },[id])
+    },[id, user])
   return (
     <ScrollView>
      <View style={styles.container}>
+        <Text style={styles.head}>Welcome {name}</Text>
         <Text style={styles.head}>{title}</Text>
         <Image
             source={{uri:thumbnail}}

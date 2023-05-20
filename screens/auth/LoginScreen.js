@@ -1,198 +1,210 @@
-import { StyleSheet, Text, View , Image, TextInput, TouchableOpacity} from 'react-native'
-import { AntDesign } from '@expo/vector-icons'; 
-import { Entypo } from '@expo/vector-icons'; 
-import { FontAwesome } from '@expo/vector-icons'; 
-import { Ionicons } from '@expo/vector-icons'; 
-import { hr80 } from '../../constant/constant';
-import React, { useState } from 'react'
-const LoginScreen = ({navigation}) => {
-    const [emailFocus, setEmailFocus]=useState(false)
-    const [passwordFocus, setPasswordFocus]=useState(false)
-    const [showPassword, setShowPassword]=useState(false)
+import {StyleSheet, Text, View, TouchableOpacity,SafeAreaView } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { useDispatch,useSelector } from 'react-redux'
+import { loginUser } from '../../store/auth/authActions'
+import Input from '../../components/UI/input/Input'
+
+const SignInScreen = ({navigation, route}) => {
+    
+  const dispatch=useDispatch()
+  const {loading,error,success,token,isLoggedIn,user,message}=useSelector((state)=>state.auth)
+
+  const [emailFocus, setEmailFocus]=useState(false)
+  const [passwordFocus, setPasswordFocus]=useState(false)
+  const [showPassword, setShowPassword]=useState(false)
+
+  const [inputValues, setInputValues]=useState({
+    email:'',
+    password:'',
+})
+
+  const [validationErrors, setValidationErrors]=useState({})
+
+
+  function inputChangeHandler(InputIndentifier,enteredValue){
+    setInputValues((currentValues)=>{
+        return {
+            ...currentValues,
+            [InputIndentifier]:enteredValue
+        }
+    })
+}
+
+//check input validation
+const validate=()=>{
+    const errors={};
+    const nameRegex= /^[A-Za-z0-9]{3,16}$/;
+    const emailRegex= /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
+    const passwordRegex= /^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,20}$/
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
+
+   
+    if(!inputValues.email){
+        errors.email="Email is required";
+    }else if(!emailRegex.test(inputValues.email)){
+        errors.email="It should be a valid email address";
+    }
+
+    if(!inputValues.password){
+        errors.password="Password is required";
+    }else if(inputValues.password.length < 4){
+        errors.password="Password must be more than 4 characters";
+    }else if(inputValues.password.length > 15){
+        errors.password="Password cannot exceed more than 10 characters";
+    }else if(!passwordRegex.test(inputValues.password)){
+        errors.password="Password should be 8-20 characters and include at least 1 letter, 1 number and 1 special character"
+    }
+
+
+
+    return errors
+}
+
+ //check empty validationError objects
+ const isObjectEmpty = (objectName) => {
+    return (
+      objectName &&
+      Object.keys(objectName).length === 0 &&
+      objectName.constructor === Object
+    );
+
+};
+
+function submitHandler(){
+
+    //input validations
+    const errors=validate(inputValues)
+
+    setValidationErrors(errors)
+
+    if(!isObjectEmpty(errors)){
+        return
+
+    }else{
+        console.log("[value]",inputValues)
+        dispatch(loginUser(inputValues))
+    }
+    //reset form values
+    setInputValues({
+        email:'',
+        password:'',
+    })
+}
+
   return (
-    <View style={styles.formContainer}>
-        <View style={styles.logo}>
-            <Image
-                style={styles.logoImg}
-                source={require("../../assets/logo/logo.png")}   
-            />
+    <SafeAreaView style={{flex:1}}>
+    <View style={styles.container}>
+    <View style={styles.form}>
+        <Text style={styles.head}>SignIn</Text>
+        <Text style={{color:'crimson',fontSize:24}}>{message?message:null}</Text>
+        <Input
+            label="Email"
+            inputConfig={{
+                placeholder:"enter email",
+                keyboardType:'email-address',
+                onChangeText:inputChangeHandler.bind(this,'email'),
+                onFocus:()=>{
+                    setEmailFocus(true)
+                    setPasswordFocus(false)
+                },
+                value:inputValues.email
+            }}
+            iconConfig={{
+                name:"email",
+                size:24,
+                color:emailFocus===true?color="white":color="black"
+            }}
+        />
+            {
+            validationErrors && validationErrors.email?(<Text style={{color:'red', fontSize:15, fontWeight:'bold'}}>{validationErrors.email}</Text>):null
+            }
+        <Input
+            label="Password"
+            inputConfig={{
+                placeholder:"enter password",
+                secureTextEntry:showPassword===false? true:false,
+                onChangeText:inputChangeHandler.bind(this,'password'),
+                onFocus:()=>{
+                    setEmailFocus(false)
+                    setShowPassword(false)
+                    setPasswordFocus(true)
+                },
+                value:inputValues.password
+            }}
+            iconConfig={{
+                name:"lock",
+                size:24,
+                color:passwordFocus===true?color="white":color="black"
+            }}
+            passwordConfig={{
+                name:showPassword===false?"eye-off":"eye",
+                size:24,
+                color:"white",
+                onPress:()=>setShowPassword(!showPassword)
+            }}
+        />
+         {
+            validationErrors && validationErrors.password?(<Text style={{color:'red', fontSize:15, fontWeight:'bold'}}>{validationErrors.password}</Text>):null
+            }
+         <TouchableOpacity
+                style={styles.btn}
+                onPress={submitHandler}
+            >
+                <Text style={styles.btnText}>SIGN IN</Text>
+            </TouchableOpacity>
         </View>
-        <View style={styles.loginForm}>
-            <Text style={styles.headerText}>Sign In</Text>
-            <View style={styles.inputContainer}>
-                <Entypo 
-                    name="email" 
-                    size={24} 
-                    color={emailFocus===true?color="crimson":color="black"} 
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder='Enter Email'
-                    onFocus={()=>{
-                        setEmailFocus(true)
-                        setPasswordFocus(false)
-                    }}
-                />
-            </View>
-            <View style={styles.inputContainer}>
-            <Entypo 
-                name="lock" 
-                size={24} 
-                color={passwordFocus===true?color="crimson":color="black"}   
-            />
-                <TextInput
-                    style={styles.input}
-                    placeholder='Enter Password'
-                    onFocus={()=>{
-                        setEmailFocus(false)
-                        setPasswordFocus(true)
-                        setShowPassword(false)
-                    }}
-                    secureTextEntry={showPassword===false? true:false}
-                />
-                <Ionicons 
-                name={showPassword===false?"eye-off":"eye"} 
-                size={24} 
-                color="black" 
-                onPress={()=>setShowPassword(!showPassword)}
-                />
-            </View>
-        </View>
-        <View style={styles.hr80}/>
-        <TouchableOpacity
-            style={styles.btn}
-            onPress={()=>navigation.navigate('Home')}
-        >
-            <Text style={styles.btnText}>Sign In</Text>
-        </TouchableOpacity>
-        <Text style={styles.forget}>Forget Password?</Text>
-        <Text style={styles.or}>Or</Text>
-        <Text style={{fontSize:18}}>Sign In With</Text>
-        <View style={styles.gf}>
-            <TouchableOpacity>
-                <View style={styles.icon}>
-                    <AntDesign name="google" size={24} color="crimson" />
-                </View>
-            </TouchableOpacity>       
-            <TouchableOpacity>
-                <View style={styles.icon}>
-                    <FontAwesome name="facebook-square" size={24} color="blue" />
-                </View>
-            </TouchableOpacity>       
-        </View>
-        <View style={styles.hr80}/>
-        <Text>
-            Don't have an account?
+        <Text>Aready have an account?
             <Text 
                 style={styles.signup}
                 onPress={()=>navigation.navigate('SignUp')}
-            >Sing In</Text>
-        </Text>
-    </View>
+                >Sing Up</Text>
+                </Text>
+        </View>
+    </SafeAreaView>
+    
   )
-
 }
 
-export default LoginScreen
+export default SignInScreen
 
 const styles = StyleSheet.create({
-    formContainer:{
-        flex:1,
-        width:'100%',
-        justifyContent:'center',
-        alignItems:'center'
+  container:{
+    flex:1,
+    alignItems:'center',
+    marginVertical:8,
+    backgroundColor:'white'
+  },
+  form:{
+      width:'90%',
+      fontSize:18,
+      justifyContent:'center',
+      alignItems:'center'
+  },
+  head:{
+      textAlign:'center',
+      fontSize:20
+  },
+  btnText:{
+    textAlign:'center',
+    color:'white',
+    fontSize:18,
+    fontWeight:700,
+    fontSize:20
     },
-    logo:{
-        justifyContent:'center',
-        alignItems:'center',
-        width:'100%',
-        marginVertical:10
-    },
-    logoImg:{
-        width:100,
-        height:100
-    },
-    headerText:{
-        fontSize:20,
-        fontWeight:700,
-        marginTop:10,
-        marginBottom:10,
-        color:'crimson'
-    },
-    loginForm:{
-        width:'90%',
-        justifyContent:'center',
-        alignItems:'center',
-        // backgroundColor:'crimson'
-    },
-    inputContainer:{
-        flexDirection:'row',
-        width:'95%',
-        backgroundColor:'white',
-        justifyContent:'flex-start',
-        alignItems:'center',
-        padding:10,
-        borderRadius:8,
-        elevation:20,
-        shadowOpacity:0.5,
-        shadowColor:'crimson',
-        shadowOffset:{width:20,height:20},
-        marginBottom:15,
-    },
-    input:{
-        width:'80%',
-        marginLeft:10,
-        paddingVertical:5,
-        fontSize:18
-    },
-    btnText:{
-        color:'white',
-        fontSize:18,
-        fontWeight:700,
-        fontSize:20
-    },
-    btn:{
-        backgroundColor:'crimson',
-        paddingHorizontal:15,
-        paddingVertical:8,
-        marginRight:8,
-        textAlign:'center', 
-        borderRadius:10
-    },
-    forget:{
-        color:'grey',
-        marginBottom:10,
-        marginTop:10
-    },
-    or:{
-        color:'crimson',
-        marginBottom:10,
-        marginTop:10,
-        fontSize:18,
-        fontWeight:'bold'
-    },
-    gf:{
-        marginTop:10,
-        flexDirection:'row',
-        justifyContent:'center',
-        alignItems:'center'
-    },
-    icon:{
-        width:50,
-        marginLeft:10,
-        backgroundColor:'white',
-        padding:10,
-        justifyContent:'center',
-        alignItems:'center',
-        elevation:20,
-        borderRadius:8,
-        marginBottom:10
-    },
-    signup:{
-        fontSize:15,
-        marginTop:10,
-        color:'crimson',
-        fontWeight:'bold',
-        marginRight:8
-    }
+btn:{
+    width:'50%',
+    backgroundColor:'crimson',
+    paddingHorizontal:15,
+    paddingVertical:8,
+    marginRight:8,
+    textAlign:'center', 
+    borderRadius:10
+},
+signup:{
+    fontSize:15,
+    marginTop:10,
+    color:'crimson',
+    fontWeight:'bold',
+    marginRight:8,
+}
 })

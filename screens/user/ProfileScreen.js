@@ -1,10 +1,24 @@
 import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, {useEffect} from 'react'
 
-const ProfileScreen = () => {
+const ProfileScreen = ({route,navigation,user}) => {
+
+  // const {name,email}=route.params?.userData
+
+  // useEffect(() => {
+    
+  // }, [route.params?.userData])
+
+  useEffect(()=>{
+
+  },[user])
+
+  const {name,email}=user
+  
+  
   return (
     <View>
-      <Text>ProfileScreen</Text>
+      <Text>Welcome {name}</Text>
     </View>
   )
 }

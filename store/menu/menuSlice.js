@@ -11,33 +11,35 @@ const menuSlice=createSlice({
     name:"menu",
     initialState,
     reducers:{},
-    extraReducers:{
-        [fetchMenus.pending]:(state,action)=>{
-            state.loading=true
-        },
-        [fetchMenus.fulfilled]:(state,action)=>{
-            console.log("[state]",state.user);
-            console.log("[action]",action);
-            state.loading=false,
-            state.menus=action.payload
-        },
-        [fetchMenus.rejected]:(state,action)=>{
-            state.loading=true,
-            state.error=action.payload
-        },
-        [fetchMenu.pending]:(state,action)=>{
-            state.loading=true
-        },
-        [fetchMenu.fulfilled]:(state,action)=>{
-            console.log("[state]",state.user);
-            console.log("[action]",action);
-            state.loading=false,
-            state.menuDetails=action.payload
-        },
-        [fetchMenu.rejected]:(state,action)=>{
-            state.loading=true,
-            state.error=action.payload
-        },
+    extraReducers:(builder)=>{
+        builder
+            .addCase(fetchMenus.pending,(state)=>{
+                state.loading=true
+            })
+            .addCase(fetchMenus.fulfilled,(state,action)=>{
+                // console.log("[action]",action);
+                state.loading=false,
+                state.menus=action.payload
+            })
+            .addCase(fetchMenus.rejected,(state,action)=>{
+                state.loading=true,
+                state.error=action.payload
+            })
+
+            .addCase(fetchMenu.pending,(state)=>{
+                state.loading=true
+
+            })
+            .addCase(fetchMenu.fulfilled,(state,action)=>{
+                // console.log("[state]",state.user);
+                // console.log("[action]",action);
+                state.loading=false,
+                state.menuDetails=action.payload
+            })
+            .addCase(fetchMenu.rejected,(state,action)=>{
+                state.loading=true,
+                state.error=action.payload
+            })
     }
 })
 
